@@ -2,15 +2,16 @@ package com.link184.extensions
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.annotation.StringRes
-import android.support.design.widget.TextInputLayout
-import android.support.v4.view.ViewCompat
-import android.support.v7.app.AlertDialog
+import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import com.google.android.material.textfield.TextInputLayout
 
 /**
  * A extension to easily load images from url directly to [ImageView] with [GlideApp]
@@ -18,7 +19,7 @@ import android.widget.ImageView
  * @param block here glide can be configured
  */
 inline fun ImageView.loadUrl(url: String, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
-    block(GlideApp.with(this).load(url)).into(this)
+    loadUri(Uri.parse(url), block)
 }
 
 /**
@@ -27,11 +28,28 @@ inline fun ImageView.loadUrl(url: String, block: GlideRequest<Drawable>.() -> Gl
  * @throws IllegalStateException when image view array size is different from url array size
  */
 fun Array<ImageView>.loadUrl(vararg url: String, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
-    if (size != url.size) {
+    loadUri(*url.map { Uri.parse(it) }.toTypedArray(), block = block)
+}
+/**
+ * A extension to easily load images from url directly to [ImageView] with [GlideApp]
+ * @param url a url with image
+ * @param block here glide can be configured
+ */
+inline fun ImageView.loadUri(uri: Uri, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
+    block(GlideApp.with(this).load(uri)).into(this)
+}
+
+/**
+ * [ImageView] and url will be grouped consecutively. Take care to pass all urls and ImageViews
+ * in the same order.
+ * @throws IllegalStateException when image view array size is different from url array size
+ */
+fun Array<ImageView>.loadUri(vararg uri: Uri, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
+    if (size != uri.size) {
         throw IllegalStateException("Image view and image url count do not correspond.")
     }
     forEachIndexed { index, it ->
-        it.loadUrl(url[index], block)
+        it.loadUri(uri[index], block)
     }
 }
 
