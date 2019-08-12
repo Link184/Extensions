@@ -1,6 +1,7 @@
 package com.link184.extensions
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.Editable
@@ -11,6 +12,9 @@ import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.textfield.TextInputLayout
 
 /**
@@ -27,7 +31,7 @@ inline fun ImageView.loadUrl(url: String, block: GlideRequest<Drawable>.() -> Gl
  * in the same order.
  * @throws IllegalStateException when image view array size is different from url array size
  */
-fun Array<ImageView>.loadUrl(vararg url: String, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
+inline fun Array<ImageView>.loadUrl(vararg url: String, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
     loadUri(*url.map { Uri.parse(it) }.toTypedArray(), block = block)
 }
 /**
@@ -44,13 +48,43 @@ inline fun ImageView.loadUri(uri: Uri, block: GlideRequest<Drawable>.() -> Glide
  * in the same order.
  * @throws IllegalStateException when image view array size is different from url array size
  */
-fun Array<ImageView>.loadUri(vararg uri: Uri, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
+inline fun Array<ImageView>.loadUri(vararg uri: Uri, block: GlideRequest<Drawable>.() -> GlideRequest<Drawable> = { this }) {
     if (size != uri.size) {
         throw IllegalStateException("Image view and image url count do not correspond.")
     }
     forEachIndexed { index, it ->
         it.loadUri(uri[index], block)
     }
+}
+
+/**
+ * Loads a remote image into a [Drawable]
+ * @param uri image uri
+ * @param onSuccess drawable ready callback
+ * @param onFailure on failure callback
+ */
+fun Context.loadBitmap(uri: Uri, width: Int, height: Int, onSuccess: (Bitmap) -> Unit, onFailure: (Drawable?) -> Unit = {}) {
+    GlideApp.with(this)
+        .asBitmap()
+        .load(uri)
+        .into(object : CustomTarget<Bitmap>(width, height) {
+            override fun onLoadCleared(placeholder: Drawable?) {}
+
+            override fun onLoadFailed(errorDrawable: Drawable?) {
+                super.onLoadFailed(errorDrawable)
+                onFailure(errorDrawable)
+            }
+
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                onSuccess(resource)
+            }
+        })
+}
+fun Fragment.loadBitmap(uri: Uri,  width: Int, height: Int, onSuccess: (Bitmap) -> Unit, onFailure: (Drawable?) -> Unit = {}) {
+    context?.loadBitmap(uri,  width, height, onSuccess, onFailure)
+}
+fun View.loadBitmap(uri: Uri,  width: Int, height: Int, onSuccess: (Bitmap) -> Unit, onFailure: (Drawable?) -> Unit = {}) {
+    context?.loadBitmap(uri,  width, height, onSuccess, onFailure)
 }
 
 /**
@@ -66,9 +100,9 @@ fun TextInputLayout.text(@StringRes textResId: Int) = editText?.setText(textResI
  * Hack to hold concrete view type(not supertype) directly in listener.
  */
 @Suppress("UNCHECKED_CAST")
-infix fun <V : View> V.onClick(block: (V) -> Unit) = setOnClickListener { block(it as V) }
+infix fun <V : View> V.onClick(block: V.() -> Unit) = setOnClickListener { block(it as V) }
 
-infix fun <V : View> Array<out V>.onClick(block: (V) -> Unit) = forEach { it onClick (block) }
+inline infix fun <V : View> Array<out V>.onClick(block: V.() -> Unit) = forEach { it onClick (block) }
 
 /**
  * Show simple [AlertDialog]
