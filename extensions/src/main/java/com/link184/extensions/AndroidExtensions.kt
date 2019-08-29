@@ -1,6 +1,7 @@
 package com.link184.extensions
 
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -110,15 +111,23 @@ inline infix fun <V : View> Array<out V>.onClick(block: V.() -> Unit) = forEach 
  * @param message string resource id for dialog message
  * @return an instance of shown [AlertDialog]
  */
-fun Context.alert(@StringRes title: Int, @StringRes message: Int, positiveAction: (() -> Unit)? = null): AlertDialog {
+fun Context.alert(
+        @StringRes title: Int,
+        @StringRes message: Int,
+        positiveAction: ((DialogInterface) -> Unit)? = { it.dismiss() }
+): AlertDialog {
     return alert(getString(title), getString(message), positiveAction)
 }
 
-fun Context.alert(title: String, message: String, positiveAction: (() -> Unit)? = null): AlertDialog {
+fun Context.alert(
+        title: String,
+        message: String,
+        positiveAction: ((DialogInterface) -> Unit)? = { it.dismiss() }
+): AlertDialog {
     return AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(android.R.string.ok) { _, _ -> positiveAction?.invoke() }
+            .setPositiveButton(android.R.string.ok) { dialog, _ -> positiveAction?.invoke(dialog) }
             .show()
 }
 
