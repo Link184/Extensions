@@ -110,11 +110,11 @@ inline infix fun <V : View> Array<out V>.onClick(block: V.() -> Unit) = forEach 
  * @param message string resource id for dialog message
  * @return an instance of shown [AlertDialog]
  */
-fun Context.alert(@StringRes title: Int, @StringRes message: Int, positiveAction: (() -> Unit?)? = null): AlertDialog {
+fun Context.alert(@StringRes title: Int, @StringRes message: Int, positiveAction: (() -> Unit)? = null): AlertDialog {
     return alert(getString(title), getString(message), positiveAction)
 }
 
-fun Context.alert(title: String, message: String, positiveAction: (() -> Unit?)? = null): AlertDialog {
+fun Context.alert(title: String, message: String, positiveAction: (() -> Unit)? = null): AlertDialog {
     return AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
