@@ -6,6 +6,7 @@ import android.util.Base64
 import java.io.File
 import java.math.BigDecimal
 import java.util.*
+import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
 
@@ -43,4 +44,13 @@ fun Any.setPrivateMember(fieldName: String, newValue: Any?) =
         .apply {
             isAccessible = true
             set(this@setPrivateMember, newValue)
+        }
+
+
+inline fun <reified T : Any> T.invokePrivateMethod(methodName: String, vararg arguments: Any?) =
+    this::class.declaredMemberFunctions
+        .firstOrNull { it.name == methodName }
+        ?.let {
+            it.isAccessible = true
+            it.call(this, *arguments)
         }
