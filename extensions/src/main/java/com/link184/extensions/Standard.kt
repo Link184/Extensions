@@ -4,6 +4,7 @@ package com.link184.extensions
 
 import android.util.Base64
 import java.io.File
+import java.lang.reflect.Modifier
 import java.math.BigDecimal
 import java.util.*
 import kotlin.reflect.full.declaredMemberFunctions
@@ -43,6 +44,9 @@ fun Any.setPrivateMember(fieldName: String, newValue: Any?) =
     this::class.java.getDeclaredField(fieldName)
         .apply {
             isAccessible = true
+            val modifiersField = this::class.java.getDeclaredField("modifiers")
+            modifiersField.isAccessible = true
+            modifiersField.setInt(this, this.modifiers and Modifier.FINAL.inv())
             set(this@setPrivateMember, newValue)
         }
 
