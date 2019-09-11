@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 
 /**
@@ -124,7 +125,7 @@ fun Context.alert(
         message: String,
         positiveAction: ((DialogInterface) -> Unit)? = { it.dismiss() }
 ): AlertDialog {
-    return AlertDialog.Builder(this)
+    return MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(android.R.string.ok) { dialog, _ -> positiveAction?.invoke(dialog) }
