@@ -104,7 +104,7 @@ fun TextInputLayout.text(@StringRes textResId: Int) = editText?.setText(textResI
 @Suppress("UNCHECKED_CAST")
 infix fun <V : View> V.onClick(block: V.() -> Unit) = setOnClickListener { block(it as V) }
 
-inline infix fun <V : View> Array<out V>.onClick(block: V.() -> Unit) = forEach { it onClick (block) }
+infix fun <V : View> Array<out V>.onClick(block: V.() -> Unit) = forEach { it onClick (block) }
 
 /**
  * Show simple [AlertDialog]
