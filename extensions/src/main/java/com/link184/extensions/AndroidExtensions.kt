@@ -113,16 +113,16 @@ infix fun <V : View> Array<out V>.onClick(block: V.() -> Unit) = forEach { it on
  * @return an instance of shown [AlertDialog]
  */
 fun Context.alert(
-        @StringRes title: Int,
-        @StringRes message: Int,
+        @StringRes title: Int = -1,
+        @StringRes message: Int = -1,
         positiveAction: ((DialogInterface) -> Unit)? = { it.dismiss() }
 ): AlertDialog {
     return alert(getString(title), getString(message), positiveAction)
 }
 
 fun Context.alert(
-        title: String,
-        message: String,
+        title: String? = null,
+        message: String? = null,
         positiveAction: ((DialogInterface) -> Unit)? = { it.dismiss() }
 ): AlertDialog {
     return MaterialAlertDialogBuilder(this)
