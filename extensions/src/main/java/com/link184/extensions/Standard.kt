@@ -5,7 +5,6 @@ package com.link184.extensions
 import android.util.Base64
 import java.io.File
 import java.lang.reflect.Modifier
-import java.math.BigDecimal
 import java.util.*
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.declaredMemberProperties
@@ -22,10 +21,6 @@ inline fun <reified T : Any> T.toMap(): Map<String, Any?> {
         it.isAccessible = true
         it.name to it.get(this)
     }
-}
-
-fun Int.fromCents(): CharSequence? {
-    return "%.2f".format(toBigDecimal().divide(BigDecimal(100.00)))
 }
 
 fun Date.toCalendar(): Calendar = Calendar.getInstance().apply {
